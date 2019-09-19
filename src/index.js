@@ -1,3 +1,4 @@
+import "@babel/polyfill";
 const http = require('http');
 const requestHandler = function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
