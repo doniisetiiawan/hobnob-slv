@@ -39,6 +39,7 @@ Feature: Create User
       | password      |
 
   Scenario Outline: Request Payload with Properties of Unsupported Type
+
     When the client creates a POST request to /users/
     And attaches a Create User payload where the <field> field is not a <type>
     And sends the request
