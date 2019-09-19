@@ -1,0 +1,11 @@
+{
+  "name": "hobnob-slv",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "serve": "node index.js"
+  },
+  "repository": "https://github.com/doniisetiiawan/hobnob-slv.git",
+  "author": "Doni Setiawan <donisetiawan.050@gmail.com>",
+  "license": "MIT"
+}
