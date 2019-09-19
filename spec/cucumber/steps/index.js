@@ -109,3 +109,38 @@ When(
       .set('Content-Type', 'application/json');
   },
 );
+
+When(/^attaches a valid (.+) payload$/, function (payloadType) {
+  this.requestPayload = getValidPayload(payloadType);
+  this.request
+    .send(JSON.stringify(this.requestPayload))
+    .set('Content-Type', 'application/json');
+});
+
+Then(
+  /^the payload of the response should be an? ([a-zA-Z0-9, ]+)$/,
+  function (payloadType) {
+    const contentType = this.response.headers['Content-Type']
+      || this.response.headers['content-type'];
+    if (payloadType === 'JSON object') {
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Response not of Content-Type application/json');
+      }
+
+      try {
+        this.responsePayload = JSON.parse(this.response.text);
+      } catch (e) {
+        throw new Error('Response not a valid JSON object');
+      }
+    } else if (payloadType === 'string') {
+      if (!contentType || !contentType.includes('text/plain')) {
+        throw new Error('Response not of Content-Type text/plain');
+      }
+
+      this.responsePayload = this.response.text;
+      if (typeof this.responsePayload !== 'string') {
+        throw new Error('Response not a string');
+      }
+    }
+  },
+);
