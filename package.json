@@ -6,7 +6,14 @@
     "build": "rimraf dist && babel src -d dist",
     "serve": "yarn run build && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "nodemon -w src --exec yarn run serve"
+    "watch": "nodemon -w src --exec yarn run serve",
+    "fix": "eslint src --fix",
+    "lint": "eslint src"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn run lint"
+    }
   },
   "repository": "https://github.com/doniisetiiawan/hobnob-slv.git",
   "author": "Doni Setiawan <donisetiawan.050@gmail.com>",
@@ -15,7 +22,12 @@
     "@babel/cli": "^7.6.0",
     "@babel/core": "^7.6.0",
     "@babel/preset-env": "^7.6.0",
+    "eslint": "^6.4.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "husky": "^3.0.5",
     "nodemon": "^1.19.2",
+    "prettier": "^1.18.2",
     "rimraf": "^3.0.0"
   },
   "dependencies": {
