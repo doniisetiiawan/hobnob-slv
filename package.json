@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "serve": "node dist/index.js"
+    "build": "rm -rf dist/ && babel src -d dist",
+    "serve": "yarn run build && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "https://github.com/doniisetiiawan/hobnob-slv.git",
   "author": "Doni Setiawan <donisetiawan.050@gmail.com>",
