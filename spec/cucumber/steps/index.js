@@ -1,14 +1,17 @@
 import assert from 'assert';
 import superagent from 'superagent';
-import { When, Then } from 'cucumber';
+import { Given, When, Then } from 'cucumber';
+import elasticsearch from 'elasticsearch';
 import { getValidPayload, convertStringToArray } from './utils';
 
+const client = new elasticsearch.Client();
+
 When(
-  /^the client creates a (GET|POST|PATCH|PUT|DELETE|OPTIONS|HEAD) request to ([/\w-:.]+)$/,
+  /^the client creates a (GET|POST|PATCH|PUT|DELETE|OPTIONS|HEAD) request to ([\/\w-]+)$/,
   function (method, path) {
     this.request = superagent(
       method,
-      `${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT}${path}`,
+      `${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT_TEST}${path}`,
     );
   },
 );
@@ -19,20 +22,83 @@ When(/^attaches a generic (.+) payload$/, function (payloadType) {
       this.request
         .send('{"email": "dan@danyll.com", name: }')
         .set('Content-Type', 'application/json');
-      break;
+      return;
     case 'non-JSON':
       this.request
         .send(
           '<?xml version="1.0" encoding="UTF-8" ?><email>dan@danyll.com</email>',
         )
         .set('Content-Type', 'text/xml');
-      break;
     case 'empty':
     default:
   }
 });
 
-When(/^sends the request$/, function (callback) {
+When(/^attaches a valid (.+) payload$/, function (payloadType) {
+  this.requestPayload = getValidPayload(payloadType);
+  this.request
+    .send(JSON.stringify(this.requestPayload))
+    .set('Content-Type', 'application/json');
+});
+
+When(
+  /^attaches an? (.+) payload which is missing the ([a-zA-Z0-9, ]+) fields?$/,
+  function (payloadType, missingFields) {
+    this.requestPayload = getValidPayload(payloadType);
+    const fieldsToDelete = convertStringToArray(missingFields);
+    fieldsToDelete.forEach((field) => delete this.requestPayload[field]);
+    this.request
+      .send(JSON.stringify(this.requestPayload))
+      .set('Content-Type', 'application/json');
+  },
+);
+
+Given(
+  /^attaches an? (.+) payload where the ([a-zA-Z0-9, ]+) fields? (?:is|are)(\s+not)? a ([a-zA-Z]+)$/,
+  function (payloadType, fields, invert, type) {
+    this.requestPayload = getValidPayload(payloadType);
+    const typeKey = type.toLowerCase();
+    const invertKey = invert ? 'not' : 'is';
+    const sampleValues = {
+      string: {
+        is: 'string',
+        not: 10,
+      },
+    };
+    const fieldsToModify = fields
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s !== '');
+    fieldsToModify.forEach((field) => {
+      this.requestPayload[field] = sampleValues[typeKey][invertKey];
+    });
+    this.request
+      .send(JSON.stringify(this.requestPayload))
+      .set('Content-Type', 'application/json');
+  },
+);
+
+Given(
+  /^attaches an? (.+) payload where the ([a-zA-Z0-9, ]+) fields? (?:is|are) exactly (.+)$/,
+  function (payloadType, fields, value) {
+    this.requestPayload = getValidPayload(payloadType);
+    const fieldsToModify = convertStringToArray(fields);
+    fieldsToModify.forEach((field) => {
+      this.requestPayload[field] = value;
+    });
+    this.request
+      .send(JSON.stringify(this.requestPayload))
+      .set('Content-Type', 'application/json');
+  },
+);
+
+When(/^without a ["']([\w-]+)["'] header set$/, function (
+  headerName,
+) {
+  this.request.unset(headerName);
+});
+
+When('sends the request', function (callback) {
   this.request
     .then((response) => {
       this.response = response.res;
@@ -50,72 +116,6 @@ Then(
     assert.equal(this.response.statusCode, statusCode);
   },
 );
-
-Then(/^the payload of the response should be a JSON object$/, function () {
-  const contentType = this.response.headers['Content-Type']
-    || this.response.headers['content-type'];
-  if (!contentType || !contentType.includes('application/json')) {
-    throw new Error('Response not of Content-Type application/json');
-  }
-
-  try {
-    this.responsePayload = JSON.parse(this.response.text);
-  } catch (e) {
-    throw new Error('Response not a valid JSON object');
-  }
-});
-
-Then(
-  /^contains a message property which says (?:"|')(.*)(?:"|')$/,
-  function (message) {
-    assert.equal(this.responsePayload.message, message);
-  },
-);
-
-When(/^without a (?:"|')([\w-]+)(?:"|') header set$/, function (
-  headerName,
-) {
-  this.request.unset(headerName);
-});
-
-When(
-  /^attaches an? (.+) payload which is missing the ([a-zA-Z0-9, ]+) fields?$/,
-  function (payloadType, missingFields) {
-    const payload = {
-      email: 'e@ma.il',
-      password: 'password',
-    };
-    const fieldsToDelete = missingFields
-      .split(',')
-      .map((s) => s.trim())
-      .filter((s) => s !== '');
-    fieldsToDelete.forEach((field) => delete payload[field]);
-    this.request
-      .send(JSON.stringify(payload))
-      .set('Content-Type', 'application/json');
-  },
-);
-
-When(
-  /^attaches an? (.+) payload where the ([a-zA-Z0-9, ]+) fields? (?:is|are) exactly (.+)$/,
-  function (payloadType, fields, value) {
-    this.requestPayload = getValidPayload(payloadType);
-    const fieldsToModify = convertStringToArray(fields);
-    fieldsToModify.forEach((field) => {
-      this.requestPayload[field] = value;
-    });
-    this.request
-      .send(JSON.stringify(this.requestPayload))
-      .set('Content-Type', 'application/json');
-  },
-);
-
-When(/^attaches a valid (.+) payload$/, function (payloadType) {
-  this.requestPayload = getValidPayload(payloadType);
-  this.request
-    .send(JSON.stringify(this.requestPayload))
-    .set('Content-Type', 'application/json');
-});
 
 Then(
   /^the payload of the response should be an? ([a-zA-Z0-9, ]+)$/,
@@ -144,3 +144,42 @@ Then(
     }
   },
 );
+
+Then(
+  /^contains a message property which says ["'](.*)["']$/,
+  function (message) {
+    assert.equal(this.responsePayload.message, message);
+  },
+);
+
+Then(
+  /^the payload object should be added to the database, grouped under the "([a-zA-Z]+)" type$/,
+  function (type, callback) {
+    this.type = type;
+    client
+      .get({
+        index: process.env.ELASTICSEARCH_INDEX_TEST,
+        type,
+        id: this.responsePayload,
+      })
+      .then((result) => {
+        assert.deepEqual(result._source, this.requestPayload);
+        callback();
+      })
+      .catch(callback);
+  },
+);
+
+Then('the newly-created user should be deleted', function (callback) {
+  client
+    .delete({
+      index: process.env.ELASTICSEARCH_INDEX_TEST,
+      type: this.type,
+      id: this.responsePayload,
+    })
+    .then((res) => {
+      assert.equal(res.result, 'deleted');
+      callback();
+    })
+    .catch(callback);
+});
