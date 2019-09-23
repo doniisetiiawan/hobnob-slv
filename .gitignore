@@ -28,7 +28,6 @@ benchmarks/graphs
 
 .idea/
 yarn.lock
-
 dist/
-
 .env
+.nyc_output/

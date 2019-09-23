@@ -1,13 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import elasticsearch from 'elasticsearch';
-
-const app = express();
-app.use(bodyParser.json({ limit: 1e6 }));
-
-const client = new elasticsearch.Client({
-  host: `${process.env.ELASTICSEARCH_HOSTNAME}:${process.env.ELASTICSEARCH_PORT}`,
-});
+import * as middlewares from './middlewares';
+import * as handlers from './handlers';
 
 if (process.env.NODE_ENV === 'test') {
   process.env.ELASTICSEARCH_INDEX = process.env.ELASTICSEARCH_INDEX_TEST;
@@ -17,103 +11,20 @@ if (process.env.NODE_ENV === 'test') {
   process.env.SERVER_PORT = process.env.SERVER_PORT_DEV;
 }
 
-function checkContentTypeMiddleware(req, res, next) {
-  if (
-    ['POST', 'PATCH', 'PUT'].includes(req.method)
-    && req.headers['content-length'] !== '0'
-  ) {
-    if (!req.headers['content-type']) {
-      res.status(400);
-      res.set('Content-Type', 'application/json');
-      res.json({
-        message:
-          'The "Content-Type" header must be set for POST, PATCH, and PUT requests with a non-empty payload.',
-      });
-      return;
-    }
-    if (req.headers['content-type'] !== 'application/json') {
-      res.status(415);
-      res.set('Content-Type', 'application/json');
-      res.json({
-        message:
-          'The "Content-Type" header must always be "application/json"',
-      });
-      return;
-    }
-  }
-  next();
-}
+const app = express();
 
-app.use(checkContentTypeMiddleware);
+app.use(bodyParser.json({ limit: 1e6 }));
+app.use(middlewares.checkContentType);
+app.use(middlewares.checkContentLength);
 
-app.post('/users/', (req, res) => {
-  if (req.headers['content-length'] === '0') {
-    res.status(400);
-    res.set('Content-Type', 'application/json');
-    res.json({ message: 'Payload should not be empty' });
-    return;
-  }
-  if (
-    !Object.prototype.hasOwnProperty.call(req.body, 'email')
-    || !Object.prototype.hasOwnProperty.call(req.body, 'password')
-  ) {
-    res.status(400);
-    res.set('Content-Type', 'application/json');
-    res.json({
-      message:
-        'Payload must contain at least the email and password fields',
-    });
-    return;
-  }
-  if (
-    typeof req.body.email !== 'string'
-    || typeof req.body.password !== 'string'
-  ) {
-    res.status(400);
-    res.set('Content-Type', 'application/json');
-    res.json({
-      message: 'The email and password fields must be of type string',
-    });
-    return;
-  }
-  if (!/^[\w.+]+@\w+\.\w+$/.test(req.body.email)) {
-    res.status(400);
-    res.set('Content-Type', 'application/json');
-    res.json({ message: 'The email field must be a valid email.' });
-    return;
-  }
-  client
-    .index({
-      index: process.env.ELASTICSEARCH_INDEX,
-      type: 'user',
-      body: req.body,
-    })
-    .then((result) => {
-      res.status(201);
-      res.set('Content-Type', 'text/plain');
-      res.send(result._id);
-    })
-    .catch(() => {
-      res.status(500);
-      res.set('Content-Type', 'application/json');
-      res.json({ message: 'Internal Server Error' });
-    });
-});
+app.post('/users/', handlers.users.create);
+app.get('/users/', handlers.users.search);
+app.put('/users/:userId/profile', handlers.profile.replace);
+app.patch('/users/:userId/profile', handlers.profile.update);
+app.get('/users/:userId', handlers.users.retrieve);
+app.delete('/users/:userId', handlers.users.del);
 
-app.use((err, req, res, next) => {
-  if (
-    err instanceof SyntaxError
-    && err.status === 400
-    && 'body' in err
-    && err.type === 'entity.parse.failed'
-  ) {
-    res.status(400);
-    res.set('Content-Type', 'application/json');
-    res.json({ message: 'Payload should be in JSON format' });
-    return;
-  }
-  next();
-});
+app.use(middlewares.errorHandler);
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(

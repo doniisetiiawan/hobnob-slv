@@ -14,10 +14,24 @@
     "sourceType": "module"
   },
   "rules": {
-    "func-names": "off",
     "no-console": "off",
     "no-underscore-dangle": "off",
     "no-fallthrough": "off",
-    "no-useless-escape": "off"
-  }
+    "no-useless-escape": "off",
+    "consistent-return": "off",
+    "no-param-reassign": "off",
+    "import/no-extraneous-dependencies": "off"
+  },
+  "overrides": [
+    {
+      "files": ["*.test.js"],
+      "env": {
+        "mocha": true
+      },
+      "rules": {
+        "func-names": "off",
+        "no-return-assign": "off"
+      }
+    }
+  ]
 }
