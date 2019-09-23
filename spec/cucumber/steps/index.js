@@ -39,10 +39,13 @@ Given(
       count = Infinity;
     }
 
+    // Get the data
+    // Note that we could also have used the `require` syntax
     const source = jsonfile.readFileSync(
       `${__dirname}/../sample-data/${sourceFile}.json`,
     );
 
+    // Map the data to an array of objects as expected by Elasticsearch's API
     const action = {
       index: {
         _index: process.env.ELASTICSEARCH_INDEX_TEST,
@@ -55,6 +58,8 @@ Given(
       operations.push(source[i]);
     }
 
+    // Do a bulk index, refreshing the index to make sure
+    // it is immediately searchable in subsequent steps
     return client.bulk({
       body: operations,
       refresh: 'true',
@@ -63,7 +68,7 @@ Given(
 );
 
 When(
-  /^the client creates a (GET|POST|PATCH|PUT|DELETE|OPTIONS|HEAD) request to ([\/\w-:]+)$/,
+  /^the client creates a (GET|POST|PATCH|PUT|DELETE|OPTIONS|HEAD) request to ([\/\w-:.]+)$/,
   function (method, path) {
     const processedPath = processPath(this, path);
     this.request = superagent(
@@ -98,7 +103,7 @@ When(/^attaches a generic (.+) payload$/, function (payloadType) {
 });
 
 When(/^attaches a valid (.+) payload$/, function (payloadType) {
-  this.requestPayload = getValidPayload(payloadType);
+  this.requestPayload = getValidPayload(payloadType, this);
   this.request
     .send(JSON.stringify(this.requestPayload))
     .set('Content-Type', 'application/json');
@@ -172,6 +177,13 @@ Given(
   },
 );
 
+When(
+  /^set the HTTP header field ["']?([\w-]+)["']? to ["']?(.+)["']?$/,
+  function (headerName, value) {
+    this.request.set(headerName, value);
+  },
+);
+
 When(/^without a ["']([\w-]+)["'] header set$/, function (
   headerName,
 ) {
@@ -196,6 +208,12 @@ When(/^saves the response text in the context under ([\w.]+)$/, function (
   objectPath.set(this, contextPath, this.response.text);
 });
 
+Then(/^the payload should be equal to context.([\w-]+)$/, function (
+  contextpath,
+) {
+  assert.equal(this.responsePayload, objectPath.get(this, contextpath));
+});
+
 Then(
   /^our API should respond with a ([1-5]\d{2}) HTTP status code$/,
   function (statusCode) {
@@ -209,20 +227,24 @@ Then(
     const contentType = this.response.headers['Content-Type']
       || this.response.headers['content-type'];
     if (payloadType === 'JSON object' || payloadType === 'array') {
+      // Check Content-Type header
       if (!contentType || !contentType.includes('application/json')) {
         throw new Error('Response not of Content-Type application/json');
       }
 
+      // Check it is valid JSON
       try {
         this.responsePayload = JSON.parse(this.response.text);
       } catch (e) {
         throw new Error('Response not a valid JSON object');
       }
     } else if (payloadType === 'string') {
+      // Check Content-Type header
       if (!contentType || !contentType.includes('text/plain')) {
         throw new Error('Response not of Content-Type text/plain');
       }
 
+      // Check it is a string
       this.responsePayload = this.response.text;
       if (typeof this.responsePayload !== 'string') {
         throw new Error('Response not a string');
@@ -234,6 +256,14 @@ Then(
 Then(/^the response should contain (\d+) items$/, function (count) {
   assert.equal(this.responsePayload.length, count);
 });
+
+Then(
+  /^the response string should satisfy the regular expression (.+)$/,
+  function (regex) {
+    const re = new RegExp(regex.trim().replace(/^\/|\/$/g, ''));
+    assert.equal(re.test(this.responsePayload), true);
+  },
+);
 
 Then(
   /^the ([\w.]+) property of the response should be an? ([\w.]+) with the value (.+)$/,

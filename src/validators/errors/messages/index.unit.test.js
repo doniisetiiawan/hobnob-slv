@@ -58,6 +58,17 @@ describe('generateHumanFriendlyErrorMessage', () => {
     const expectedErrorMessage = "The '.test.path' object does not support the field 'email'";
     assert.equal(actualErrorMessage, expectedErrorMessage);
   });
+  it('should return the correct string when error.keyword is "pattern"', () => {
+    const errors = [
+      {
+        keyword: 'pattern',
+        dataPath: '.test.path',
+      },
+    ];
+    const actualErrorMessage = generateHumanFriendlyErrorMessage(errors);
+    const expectedErrorMessage = "The '.test.path' field should be a valid bcrypt digest";
+    assert.equal(actualErrorMessage, expectedErrorMessage);
+  });
   it('should prepend a prefix to the beginning of the data path if given', () => {
     // Using the additionalProperties test above as a template
     const errors = [

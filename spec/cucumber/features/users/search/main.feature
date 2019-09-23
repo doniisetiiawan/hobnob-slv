@@ -34,7 +34,7 @@ Feature: Search Users
 
   Examples:
 
-  | searchTerm | firstName |
-  | Norway     | Sindre    |
-  | Chrome     | Paul      |
-  | Osmani     | Addy      |
+  | searchTerm    | firstName |
+  | Norway        | Sindre    |
+  | Google Chrome | Paul      |
+  | Osmani        | Addy      |

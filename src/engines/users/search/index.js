@@ -15,7 +15,7 @@ function search(req) {
   const query = {
     index: process.env.ELASTICSEARCH_INDEX,
     type: 'user',
-    _sourceExclude: 'password',
+    _sourceExclude: 'digest',
   };
 
   if (typeof req.body.query === 'string' && req.body.query !== '') {

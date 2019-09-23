@@ -13,7 +13,7 @@ function retrieve(req) {
     })
     .then((res) => res._source)
     .then((res) => {
-      delete res.password;
+      delete res.digest;
       return res;
     })
     .catch((err) => {

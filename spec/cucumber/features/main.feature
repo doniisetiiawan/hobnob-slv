@@ -13,7 +13,7 @@ Feature: General
     And contains a message property which says 'The "Content-Type" header must be set for POST, PATCH, and PUT requests with a non-empty payload.'
 
     Examples:
-      | method |
-      | POST   |
-      | PATCH  |
-      | PUT    |
+    | method |
+    | POST   |
+    | PATCH  |
+    | PUT    |

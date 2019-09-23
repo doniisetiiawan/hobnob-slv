@@ -55,6 +55,7 @@ describe('Engine - Profile - Update', () => {
       const client = new elasticsearch.Client({
         host: `${process.env.ELASTICSEARCH_HOSTNAME}:${process.env.ELASTICSEARCH_PORT}`,
       });
+      // Creates a user with _id set to USER_ID
       before(() => client.index({
         index: process.env.ELASTICSEARCH_INDEX,
         type: 'user',

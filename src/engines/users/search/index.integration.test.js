@@ -8,7 +8,7 @@ const SEARCH_TERM = 'apple banana carrot';
 const USER_ID = 'TEST_USER_ID';
 const USER_OBJ = {
   email: 'e@ma.il',
-  password: 'hunter2',
+  digest: '$2y$10$6.5uPfJUCQlcuLO/SNVX3u1yU6LZv.39qOzshHXJVpaq3tJkTwiAy',
   profile: {
     summary: SEARCH_TERM,
   },
@@ -48,6 +48,7 @@ describe('Engine - User - Search', () => {
     const client = new elasticsearch.Client({
       host: `${process.env.ELASTICSEARCH_HOSTNAME}:${process.env.ELASTICSEARCH_PORT}`,
     });
+    // Creates a user with _id set to USER_ID
     before(() => client.index({
       index: process.env.ELASTICSEARCH_INDEX,
       type: 'user',
@@ -61,7 +62,7 @@ describe('Engine - User - Search', () => {
       id: USER_ID,
     }));
     describe('When the Elasticsearch operation is successful', () => {
-      it('should return with a promise that resolves to an object that matches USER_OBJ but without the password field', function () {
+      it('should return with a promise that resolves to an object that matches USER_OBJ but without the digest field', function () {
         assert.deepEqual(this.result[0], SEARCH_USER_OBJ);
         assert.equal(this.error, undefined);
       });

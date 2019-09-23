@@ -15,6 +15,15 @@ function del(req, res) {
         res.json({ message: err.message });
         return err;
       }
+      if (err.message === 'Forbidden') {
+        res.status(403);
+        res.set('Content-Type', 'application/json');
+        res.json({
+          message:
+            'Permission Denied. Can only delete yourself, not other users.',
+        });
+        return err;
+      }
       res.status(500);
       res.set('Content-Type', 'application/json');
       res.json({ message: 'Internal Server Error' });

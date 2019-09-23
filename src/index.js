@@ -16,7 +16,10 @@ const app = express();
 app.use(bodyParser.json({ limit: 1e6 }));
 app.use(middlewares.checkContentType);
 app.use(middlewares.checkContentLength);
+app.use(middlewares.authenticate);
 
+app.post('/login/', handlers.auth.login);
+app.get('/salt/', handlers.auth.getSalt);
 app.post('/users/', handlers.users.create);
 app.get('/users/', handlers.users.search);
 app.put('/users/:userId/profile', handlers.profile.replace);

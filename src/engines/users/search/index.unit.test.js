@@ -51,7 +51,7 @@ describe('Engine - User - Search', () => {
         assert.deepEqual(this.ESClientSearchStub.getCall(0).args[0], {
           index: process.env.ELASTICSEARCH_INDEX_TEST,
           type: 'user',
-          _sourceExclude: 'password',
+          _sourceExclude: 'digest',
         });
       });
     });
@@ -72,7 +72,7 @@ describe('Engine - User - Search', () => {
         assert.deepEqual(this.ESClientSearchStub.getCall(0).args[0], {
           index: process.env.ELASTICSEARCH_INDEX_TEST,
           type: 'user',
-          _sourceExclude: 'password',
+          _sourceExclude: 'digest',
           q: SEARCH_TERM,
         });
       });

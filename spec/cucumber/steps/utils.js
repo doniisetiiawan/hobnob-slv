@@ -1,18 +1,27 @@
-function getValidPayload(type) {
+import objectPath from 'object-path';
+
+function getValidPayload(type, context = {}) {
   const lowercaseType = type.toLowerCase();
   switch (lowercaseType) {
-    case 'create user':
+    case 'get salt':
       return {
-        email: 'e@ma.il',
-        password: 'password',
+        email: context.email || 'e@ma.il',
+      };
+    case 'create user':
+    case 'login':
+      return {
+        email: context.email || 'e@ma.il',
+        digest:
+          context.digest
+          || '$2y$10$6.5uPfJUCQlcuLO/SNVX3u1yU6LZv.39qOzshHXJVpaq3tJkTwiAy',
       };
     case 'replace user profile':
       return {
-        summary: 'foo',
+        summary: context.summary || 'foo',
       };
     case 'update user profile':
       return {
-        name: {
+        name: context.name || {
           middle: 'd4nyll',
         },
       };
@@ -28,12 +37,15 @@ function convertStringToArray(string) {
 }
 
 function substitutePath(context, path) {
+  // First split the path into parts
   return path
     .split('/')
     .map((part) => {
+      // If the part starts with a colon (:),
+      // perform a substitution with the value of the context property with the same name
       if (part.startsWith(':')) {
         const contextPath = part.substr(1);
-        return context[contextPath];
+        return objectPath.get(context, contextPath);
       }
       return part;
     })
@@ -41,6 +53,7 @@ function substitutePath(context, path) {
 }
 
 function processPath(context, path) {
+  // If the path does not contain a colon, there's no substitution to be done
   if (!path.includes(':')) {
     return path;
   }

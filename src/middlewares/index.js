@@ -1,5 +1,11 @@
+import authenticate from './authenticate';
 import checkContentType from './check-content-type';
 import checkContentLength from './check-content-length';
 import errorHandler from './error-handler';
 
-export { checkContentType, checkContentLength, errorHandler };
+export {
+  authenticate,
+  checkContentType,
+  checkContentLength,
+  errorHandler,
+};

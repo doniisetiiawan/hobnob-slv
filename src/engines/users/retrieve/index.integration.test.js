@@ -7,7 +7,7 @@ process.env.ELASTICSEARCH_INDEX = process.env.ELASTICSEARCH_INDEX_TEST;
 const USER_ID = 'TEST_USER_ID';
 const USER_OBJ = {
   email: 'e@ma.il',
-  password: 'hunter2',
+  digest: '$2y$10$6.5uPfJUCQlcuLO/SNVX3u1yU6LZv.39qOzshHXJVpaq3tJkTwiAy',
 };
 const RETRIEVE_USER_OBJ = {
   email: 'e@ma.il',
@@ -40,6 +40,7 @@ describe('Engine - User - Retrieve', () => {
     const client = new elasticsearch.Client({
       host: `${process.env.ELASTICSEARCH_HOSTNAME}:${process.env.ELASTICSEARCH_PORT}`,
     });
+    // Creates a user with _id set to USER_ID
     before(() => client.index({
       index: process.env.ELASTICSEARCH_INDEX,
       type: 'user',

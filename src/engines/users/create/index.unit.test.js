@@ -8,7 +8,7 @@ import create from '.';
 const req = {
   body: {
     email: 'e@ma.il',
-    password: 'hunter2',
+    digest: '$2y$10$6.5uPfJUCQlcuLO/SNVX3u1yU6LZv.39qOzshHXJVpaq3tJkTwiAy',
   },
 };
 
@@ -76,7 +76,8 @@ describe('Engine - Users - Create', () => {
           type: 'user',
           body: {
             email: 'e@ma.il',
-            password: 'hunter2',
+            digest:
+              '$2y$10$6.5uPfJUCQlcuLO/SNVX3u1yU6LZv.39qOzshHXJVpaq3tJkTwiAy',
           },
         };
         assert.equal(this.ESClientIndexStub.calledOnce, true);

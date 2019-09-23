@@ -5,6 +5,11 @@ const client = new elasticsearch.Client({
 });
 
 function del(req) {
+  // If the user is trying to delete someone apart from him/herself
+  if (req.params.userId !== req.user.id) {
+    return Promise.reject(new Error('Forbidden'));
+  }
+
   return client
     .delete({
       index: process.env.ELASTICSEARCH_INDEX,
