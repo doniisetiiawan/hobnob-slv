@@ -18,8 +18,8 @@ function search(req) {
     _sourceExclude: 'digest',
   };
 
-  if (typeof req.body.query === 'string' && req.body.query !== '') {
-    query.q = req.body.query;
+  if (req.query.query !== '') {
+    query.q = req.query.query;
   }
 
   return client

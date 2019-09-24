@@ -38,6 +38,9 @@ function generateFakeSalt(seed) {
 }
 
 function getSalt(req) {
+  if (!req.query.email) {
+    return Promise.reject(new Error('Email not specified'));
+  }
   return client
     .search({
       index: process.env.ELASTICSEARCH_INDEX,
@@ -45,7 +48,7 @@ function getSalt(req) {
       body: {
         query: {
           match: {
-            email: req.body.email,
+            email: req.query.email,
           },
         },
       },
@@ -55,7 +58,7 @@ function getSalt(req) {
     .then(bcrypt.getSalt)
     .catch((err) => {
       if (err.message === NO_RESULTS_ERROR_MESSAGE) {
-        return generateFakeSalt(req.body.email);
+        return generateFakeSalt(req.query.email);
       }
       return Promise.reject(new Error('Internal Server Error'));
     });

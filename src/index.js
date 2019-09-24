@@ -1,3 +1,4 @@
+import fs from 'fs';
 import express from 'express';
 import bodyParser from 'body-parser';
 import * as middlewares from './middlewares';
@@ -13,6 +14,18 @@ if (process.env.NODE_ENV === 'test') {
 
 const app = express();
 
+app.use((req, res, next) => {
+  res.header(
+    'Access-Control-Allow-Origin',
+    `http://${process.env.SWAGGER_UI_HOST}:${process.env.SWAGGER_UI_PORT}`,
+  );
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
+  next();
+});
+
 app.use(bodyParser.json({ limit: 1e6 }));
 app.use(middlewares.checkContentType);
 app.use(middlewares.checkContentLength);
@@ -26,6 +39,19 @@ app.put('/users/:userId/profile', handlers.profile.replace);
 app.patch('/users/:userId/profile', handlers.profile.update);
 app.get('/users/:userId', handlers.users.retrieve);
 app.delete('/users/:userId', handlers.users.del);
+
+app.get('/openapi.yaml', (req, res, next) => {
+  fs.readFile(`${__dirname}/openapi.yaml`, (err, file) => {
+    if (err) {
+      res.status(500);
+      res.end();
+      return next();
+    }
+    res.write(file);
+    res.end();
+    return next();
+  });
+});
 
 app.use(middlewares.errorHandler);
 

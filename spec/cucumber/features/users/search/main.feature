@@ -6,11 +6,18 @@ Feature: Search Users
     Given all documents of type "user" are deleted
     And all documents in the "javascript-experts" sample are added to the index with type "user"
 
+  Scenario: No Query Term is Provided
+    When the client creates a GET request to /users/
+    And sends the request
+    Then our API should respond with a 200 HTTP status code
+    And the payload of the response should be an array
+    And the response should contain 10 items
+    
   Scenario Outline: When there 10 or fewer users
     Given all documents of type "user" are deleted
     And <count> documents in the "javascript-experts" sample are added to the index with type "user"
     When the client creates a GET request to /users/
-    And attaches {"query": ""} as the payload
+    And set "query=" as a query parameter
     And sends the request
     Then our API should respond with a 200 HTTP status code
     And the payload of the response should be an array
@@ -26,7 +33,7 @@ Feature: Search Users
   Scenario Outline: Results come back in the correct order if search term is given
 
     When the client creates a GET request to /users/
-    And attaches {"query": "<searchTerm>"} as the payload
+    And set "query=<searchTerm>" as a query parameter
     And sends the request
     Then our API should respond with a 200 HTTP status code
     And the payload of the response should be an array

@@ -83,6 +83,12 @@ When(/^attaches (.+) as the payload$/, function (payload) {
   this.request.send(payload).set('Content-Type', 'application/json');
 });
 
+When(/^set ["'](.+)["'] as a query parameter$/, function (
+  queryString,
+) {
+  return this.request.query(queryString);
+});
+
 When(/^attaches a generic (.+) payload$/, function (payloadType) {
   switch (payloadType) {
     case 'malformed':
@@ -107,6 +113,11 @@ When(/^attaches a valid (.+) payload$/, function (payloadType) {
   this.request
     .send(JSON.stringify(this.requestPayload))
     .set('Content-Type', 'application/json');
+});
+
+When(/^set a valid (.+) query string$/, function (payloadType) {
+  this.query = getValidPayload(payloadType, this);
+  this.request.query(this.query);
 });
 
 When(

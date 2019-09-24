@@ -6,7 +6,7 @@ import ValidationError from '../errors/validation-error';
 function validate(req) {
   const ajvValidate = new Ajv().compile(searchUserSchema);
 
-  const valid = ajvValidate(req.body);
+  const valid = ajvValidate(req.query);
   if (!valid) {
     return new ValidationError(
       generateHumanFriendlyErrorMessage(ajvValidate.errors),
