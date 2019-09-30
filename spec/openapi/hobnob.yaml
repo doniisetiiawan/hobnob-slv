@@ -50,7 +50,7 @@ components:
           type: string
           pattern: ^\\$2[aby]?\\$\\d{1,2}\\$[.\\/A-Za-z0-9]{53}$
         profile:
-          $ref: '#/components/schemas/Profile'
+          $ref: "#/components/schemas/Profile"
       additionalProperties: false
       required:
         - email
@@ -72,7 +72,7 @@ components:
           type: string
           format: email
         profile:
-          $ref: '#/components/schemas/Profile'
+          $ref: "#/components/schemas/Profile"
       additionalProperties: false
       required:
         - email
@@ -111,7 +111,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UserLimited'
+            $ref: "#/components/schemas/UserLimited"
     UsersRetrieved:
       description: Users Retrieved from Search Operation
       content:
@@ -119,43 +119,43 @@ components:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/UserLimited'
+              $ref: "#/components/schemas/UserLimited"
     ErrorBadRequest:
       description: Bad Request
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     ErrorUnauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     ErrorForbidden:
       description: Forbidden
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     ErrorNotFound:
       description: Not Found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     ErrorUnsupportedMediaType:
       description: Unsupported Media Type
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     ErrorInternalServer:
       description: Internal Server Error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
   securitySchemes:
     token:
       type: http
@@ -182,14 +182,14 @@ paths:
                   type: string
                   pattern: ^\\$2[aby]?\\$\\d{1,2}\\$[.\\/A-Za-z0-9]{53}$
       responses:
-        '200':
-          $ref: '#/components/responses/LoginSuccess'
-        '400':
-          $ref: '#/components/responses/ErrorBadRequest'
-        '401':
-          $ref: '#/components/responses/ErrorUnauthorized'
-        '500':
-          $ref: '#/components/responses/ErrorInternalServer'
+        "200":
+          $ref: "#/components/responses/LoginSuccess"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "500":
+          $ref: "#/components/responses/ErrorInternalServer"
   /salt/:
     get:
       tags:
@@ -205,12 +205,12 @@ paths:
             type: string
             format: email
       responses:
-        '200':
-          $ref: '#/components/responses/SaltRetrieved'
-        '400':
-          $ref: '#/components/responses/ErrorBadRequest'
-        '500':
-          $ref: '#/components/responses/ErrorInternalServer'
+        "200":
+          $ref: "#/components/responses/SaltRetrieved"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "500":
+          $ref: "#/components/responses/ErrorInternalServer"
   /users/:
     get:
       tags:
@@ -223,12 +223,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          $ref: '#/components/responses/UsersRetrieved'
-        '400':
-          $ref: '#/components/responses/ErrorBadRequest'
-        '500':
-          $ref: '#/components/responses/ErrorInternalServer'
+        "200":
+          $ref: "#/components/responses/UsersRetrieved"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "500":
+          $ref: "#/components/responses/ErrorInternalServer"
     post:
       tags:
         - Users
@@ -241,14 +241,14 @@ paths:
             schema:
               $ref: "#/components/schemas/User"
       responses:
-        '201':
-          $ref: '#/components/responses/Created'
-        '400':
-          $ref: '#/components/responses/ErrorBadRequest'
-        '415':
-          $ref: '#/components/responses/ErrorUnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/ErrorInternalServer'
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "415":
+          $ref: "#/components/responses/ErrorUnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/ErrorInternalServer"
   /users/{userId}:
     get:
       tags:
@@ -262,14 +262,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          $ref: '#/components/responses/UserRetrieved'
-        '400':
-          $ref: '#/components/responses/ErrorBadRequest'
-        '404':
-          $ref: '#/components/responses/ErrorNotFound'
-        '500':
-          $ref: '#/components/responses/ErrorInternalServer'
+        "200":
+          $ref: "#/components/responses/UserRetrieved"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        "500":
+          $ref: "#/components/responses/ErrorInternalServer"
     delete:
       tags:
         - Users
@@ -284,16 +284,16 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          $ref: '#/components/responses/UserRetrieved'
-        '400':
-          $ref: '#/components/responses/ErrorBadRequest'
-        '403':
-          $ref: '#/components/responses/ErrorForbidden'
-        '404':
-          $ref: '#/components/responses/ErrorNotFound'
-        '500':
-          $ref: '#/components/responses/ErrorInternalServer'
+        "200":
+          $ref: "#/components/responses/UserRetrieved"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "403":
+          $ref: "#/components/responses/ErrorForbidden"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        "500":
+          $ref: "#/components/responses/ErrorInternalServer"
   /users/{userId}/profile:
     patch:
       tags:
@@ -316,18 +316,18 @@ paths:
             schema:
               $ref: "#/components/schemas/Profile"
       responses:
-        '200':
-          $ref: '#/components/responses/Success'
-        '400':
-          $ref: '#/components/responses/ErrorBadRequest'
-        '401':
-          $ref: '#/components/responses/ErrorUnauthorized'
-        '404':
-          $ref: '#/components/responses/ErrorNotFound'
-        '415':
-          $ref: '#/components/responses/ErrorUnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/ErrorInternalServer'
+        "200":
+          $ref: "#/components/responses/Success"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        "415":
+          $ref: "#/components/responses/ErrorUnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/ErrorInternalServer"
     put:
       tags:
         - Profile
@@ -349,15 +349,15 @@ paths:
             schema:
               $ref: "#/components/schemas/Profile"
       responses:
-        '200':
-          $ref: '#/components/responses/Success'
-        '400':
-          $ref: '#/components/responses/ErrorBadRequest'
-        '401':
-          $ref: '#/components/responses/ErrorUnauthorized'
-        '404':
-          $ref: '#/components/responses/ErrorNotFound'
-        '415':
-          $ref: '#/components/responses/ErrorUnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/ErrorInternalServer'
+        "200":
+          $ref: "#/components/responses/Success"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        "415":
+          $ref: "#/components/responses/ErrorUnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/ErrorInternalServer"

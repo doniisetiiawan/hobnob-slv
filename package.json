@@ -4,7 +4,9 @@
   "main": "src/index.js",
   "scripts": {
     "build": "rimraf dist && babel src -d dist --copy-files",
-    "serve": "yarn run build && dotenv node dist/index.js",
+    "docs:serve": "http-server docs/dist/ -p 8100",
+    "docs:update": "git submodule update --init --recursive",
+    "serve": "yarn run build && cp spec/openapi/hobnob.yaml dist/openapi.yaml && dotenv node dist/index.js",
     "test": "yarn run test:unit && yarn run test:integration && yarn run test:e2e",
     "test:serve": "dotenv babel-node src/index.js",
     "test:e2e": "dotenv cucumber-js -- spec/cucumber/features --require-module @babel/register --require spec/cucumber/steps",
@@ -38,6 +40,7 @@
     "eslint": "^6.4.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
+    "http-server": "^0.11.1",
     "husky": "^3.0.5",
     "jsonfile": "^5.0.0",
     "lodash.clonedeep": "^4.5.0",
